@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
   @openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol: ERC20Burnable extension that adds token burning functionality.
   @openzeppelin/contracts/access/Ownable.sol: Ownable contract to manage the owner of the contract.
   */
-contract APToken is ERC20, ERC20Burnable, Ownable {
+contract Token2 is ERC20, ERC20Burnable, Ownable {
   // Total Supply
   uint256 private constant _totalSupply = 500000000 * 10 ** 18;
 
@@ -20,10 +20,7 @@ contract APToken is ERC20, ERC20Burnable, Ownable {
   /* Roles for role-based access control
   (A mapping that stores what roles each address has.)
   */
-  enum Role {
-    OWNER,
-    ADMIN
-  }
+enum Role { OWNER, ADMIN, USER }
   /* Roles for role-based access control
   (function assigns the administrator role to the first owner.)
   */
@@ -60,21 +57,14 @@ contract APToken is ERC20, ERC20Burnable, Ownable {
   */
 
   // Constructor
-  constructor(address initialOwner) ERC20("APToken", "AP") Ownable(initialOwner) {
+  constructor(address initialOwner) ERC20("BToken", "B") Ownable(initialOwner) {
     _mint(initialOwner, _totalSupply);
-    grantRole(Role.ADMIN, initialOwner);
+    grantRole(initialOwner, Role.ADMIN);
   }
 
-  function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override {
-    // Transfer to zero address is blocked
-    require(to != address(0), "Recipient address cannot be zero");
+  uint256 public constant MAX_TRANSFER_AMOUNT = 100000 * 10 ** 18;
 
-    // Transfer from zero address is blocked
-    require(from != address(0), "Sender address cannot be zero");
 
-    // Confirm token transfer
-    super._beforeTokenTransfer(from, to, amount);
-}
 
 
   // tokenBurn
@@ -99,6 +89,7 @@ contract APToken is ERC20, ERC20Burnable, Ownable {
   }
 
   // Role Based System
+
   modifier onlyAdmin() {
     require(hasRole(Role.ADMIN, msg.sender), "Authorized access required");
     _;
@@ -123,4 +114,19 @@ contract APToken is ERC20, ERC20Burnable, Ownable {
   function hasRole(Role role, address account) public view returns (bool) {
     return _roles[account] == role;
   }
+
+  //function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override {
+    // Transfer to zero address is blocked
+   // require(to != address(0), "Recipient address cannot be zero");
+
+    // Transfer from zero address is blocked
+   // require(from != address(0), "Sender address cannot be zero");
+
+    // Confirm token transfer
+    // super._beforeTokenTransfer(from, to, amount);
+/*
+    if (!hasRole(msg.sender, Role.ADMIN)) {
+            require(amount <= 1000 * 10 ** 18, "max 10");
 }
+*/
+  }
